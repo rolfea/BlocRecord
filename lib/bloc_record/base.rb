@@ -1,11 +1,13 @@
 require 'bloc_record/utility'
 require 'bloc_record/schema'
 require 'bloc_record/persistence'
+require 'bloc_record/selection'
 require 'bloc_record/connection'
 
  module BlocRecord
    class Base
      extend Persistence
+     extend Selection
      extend Schema
      extend Connection
 
@@ -15,7 +17,7 @@ require 'bloc_record/connection'
        self.class.columns.each do |col|
          self.class.send(:attr_accessor, col)
          self.instance_variable_set("@#{col}", options[col])
-       end       
+       end
      end
    end
  end
