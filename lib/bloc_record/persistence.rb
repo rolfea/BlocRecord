@@ -14,7 +14,7 @@ module Persistence
 
       connection.execute <<-SQL
         INSERT INTO #{table} (#{attributes.join(","})
-        VALUES (#{vales.join(",")});
+        VALUES (#{vals.join(",")});
       SQL
 
       data = Hash[attributes.zip attrs.values]

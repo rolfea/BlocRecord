@@ -1,0 +1,31 @@
+1. A ruby gem is a library that extends the functionality of Ruby beyond the included
+standard library of methods. You would use a gem to add features to your code without having to
+create a potentially robust set of methods or functions on your own.
+
+2. Eager loading describes an algorithm or other design component of software that loads or readies
+every object immediately. Lazy loading defers the load of certain objects until some criteria is met
+or need for the object expressed.
+
+3. CREATE TABLE initiates the creation of a new SQL table. This requires us to define columns and their data
+types as well as any table constraints, such as a Foreign Key. INSERT INTO is query that adds additional values
+to columns in a table.
+
+4. When you use the 'include Class' phrase in the definition of a class, methods from the included class
+will be available as instance methods in the new class. Likewise, use of the 'extend Class' will add class
+methods to the new class.
+Choosing to extend or include a class would be subject to the same criteria as choosing to use an instance
+versus a class method. If the methods in the class I was including needed to be available on specific
+objects I would use the 'include' syntax, otherwise, for a Class-wide method use, I would use
+the 'extend' syntax.
+
+5. Both of these methods need to be called on instances of the objects in question, not the class itself.
+Class methods would be inappropriate in this case, because they operate on the entire scope of the class
+and not individual instances of it. Because we need to save the instances of these objects to the database,
+we need to use instance methods, which will be carried over to the base class by 'including' the Persistence
+module.
+
+6. UPDATE characters SET character_name,star_rating WHERE id = (SELECT 1);
+
+7. In order for entries to return something, it must exist. We removed the initializer from address_book.rb that
+set entries as an array, so presumably we will replace this with a reference to the database so that any
+entries will persist after the program is closed.
