@@ -1,7 +1,7 @@
 require 'sqlite3'
 
 module Selection
-  def find(#ids)
+  def find(ids)
     if ids.length == 1
       find_one(ids.first)
     else
@@ -87,7 +87,7 @@ module Selection
   private
   def init_object_from_row(row)
     if row
-      data = Hash[columns.zip(row))]
+      data = Hash[columns.zip(row)]
       new(data)
     end
   end
