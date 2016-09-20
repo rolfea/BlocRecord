@@ -9,3 +9,12 @@ def find_by(contact, contact_id)
   SQL
   results
 end
+
+def find_all_by(attribute, value)
+  rows = connection.execute <<-SQL
+    SELECT #{columns.join(",")} FROM #{table}
+    WHERE attribute = #{BlocRecord::Utility.sql_strings(value)};
+  SQL
+
+  rows_to_array(rows)
+end
