@@ -85,6 +85,10 @@ module Selection
   end
 
   private
+  def method_missing(find_by, *args, &block)
+
+  end
+
   def init_object_from_row(row)
     if row
       data = Hash[columns.zip(row)]

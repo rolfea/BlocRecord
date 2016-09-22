@@ -10,11 +10,25 @@ def find_by(contact, contact_id)
   results
 end
 
-def find_all_by(attribute, value)
+def find_each(hash)
   rows = connection.execute <<-SQL
     SELECT #{columns.join(",")} FROM #{table}
-    WHERE attribute = #{BlocRecord::Utility.sql_strings(value)};
+    WHERE id = #{hash[:start]} LIMIT #{hash[:batch_size]}
   SQL
+  # passes each entry in array to block iterator
+  current_row_index = 0
+  while current_row_index <= rows.length - 1
+    yield rows[current_row_index]
+    current_row_index += 1
+  end
+end
 
-  rows_to_array(rows)
+def find_in_batches(hash)
+  # load the array of rows
+  rows = connection.execute <<-SQL
+    SELECT #{columns.join(",")} FROM #{table}
+    WHERE id = #{hash[:start]} LIMIT #{hash[:batch_size]}
+  SQL
+  # pass the full rows array to block iterator
+  yield rows
 end
