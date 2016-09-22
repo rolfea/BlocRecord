@@ -30,5 +30,5 @@ def find_in_batches(hash)
     WHERE id = #{hash[:start]} LIMIT #{hash[:batch_size]}
   SQL
   # pass the full rows array to block iterator
-  yield rows
+  yield rows`
 end
