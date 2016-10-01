@@ -178,7 +178,7 @@ def order(*args)
         rows = connection.execute <<-SQL
           SELECT * FROM #{table}
           INNER JOIN #{expression[0]} ON #{expression[0]}.#{table}_id = #{table}.id
-          INNER JOIN #{expression[1]} ON #{expression[1]}.#{table}_id = #{table}.id
+          INNER JOIN #{expression[1]} ON #{expression[1]}.#{expression[0]}_id = #{table}.id
         SQL
       end
     end
