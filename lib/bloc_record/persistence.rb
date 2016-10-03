@@ -69,8 +69,20 @@ module Persistence
       self.class.update(self.id, { attribute => value })
     end
 
+    def update_attributes(updates)
+      self.class.update(self.id, updates)
+    end
+
     def update_all(updates)
       update(nil, updates)
+    end
+
+    def self.method_missing(method_symbol, *arguments, &block)
+      if method_symbol.to_s =~ /^update_(.*)$/
+        update_attribute($1.to_sym => arguments.first) # does this auto fill in the provided arguments?
+      else
+        super #looks for the method in parent classes
+      end
     end
   end
 end
