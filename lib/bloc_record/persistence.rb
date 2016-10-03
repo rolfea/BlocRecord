@@ -23,9 +23,15 @@ module Persistence
     end
 
     def update(ids, updates)
-      updates = BlocRecord::Utility.convert_keys(updates)
-      updates.delete("id")
-      updates_array = updates.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }
+      # add a check for class of updates in case an array of attributes for diff
+      # records is passed (assignment 5)
+      if updates.class == Hash
+        updates = BlocRecord::Utility.convert_keys(updates)
+        updates.delete("id")
+        updates_array = updates.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }
+      elsif updates.class == Array
+        updates_array = updates
+      end
 
       if ids.class == Fixnum
         where_clause = "WHERE id = #{ids};"
