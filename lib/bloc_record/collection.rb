@@ -5,6 +5,18 @@ module BlocRecord
       self.any? ? self.first.class.update(ids, updates) : false
     end
 
+    def group(*args)
+      ids = self.map(&:id)
+      self.any? ? self.first.class.group_by_ids(ids, args) : false
+    end
+
+    def distinct # same chaining issue as other places - not sure what we're selecting FROM
+      row = connection.execute <<-SQL
+        SELECT DISTINCT FROM --subset of table returned by selection?
+      SQL
+
+    end
+
     def take(num=1)
       rows = connection.execute <<-SQL
         SELECT * FROM #{table}

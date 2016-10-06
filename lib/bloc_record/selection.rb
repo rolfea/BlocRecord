@@ -84,6 +84,35 @@ module Selection
     rows_to_array(rows)
   end
 
+  def select(*fields)
+    rows = connection.execute <<-SQL
+      SELECT #{fields * ", "} FROM #{table}
+    SQL
+    collection = BlocRecord::Collection.new
+
+    rows.each { |row| collection << new(Hash[fields.zip(row)]) }
+    collection
+  end
+
+  def limit(value, offset=0)
+    rows = connection.execute <<-SQL
+      SELECT * FROM #{table}
+      LIMIT #{value} OFFSET #{offset}
+    SQL
+    rows_to_array(rows)
+  end
+
+  def group(*args)
+    conditions = args.join(', ')
+
+    rows = connection.execute <<-SQL
+      SELECT * FROM #{table}
+      GROUP BY #{conditions}
+    SQL
+
+    rows_to_array(rows)
+  end
+
   def where(*args)
     # check for nil
     if args.length == 0 # where returns object with a #not method
