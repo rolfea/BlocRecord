@@ -10,12 +10,22 @@ module BlocRecord
       self.any? ? self.first.class.group_by_ids(ids, args) : false
     end
 
-    def distinct # same chaining issue as other places - not sure what we're selecting FROM
-      self.#something
-      row = connection.execute <<-SQL
-        SELECT DISTINCT FROM #{self}--subset of table returned by selection?
-      SQL
-
+    def distinct
+      # new collection object to return
+      distinct_array = Collection.new
+      # loop through collection and check for duplications
+      # this is O(n^2), right? so extremely inefficient
+      for i in (0..self.length - 1) do
+        self.each do |entry|
+          if self[i] == entry
+            break
+          else
+            distinct_array << self[i]
+          end
+        end
+      end
+      # return first distinct in this new Array
+      distinct_array.first
     end
 
     def take(num=1)
