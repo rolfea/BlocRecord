@@ -88,10 +88,15 @@ module Selection
     rows = connection.execute <<-SQL
       SELECT #{fields * ", "} FROM #{table}
     SQL
-    collection = BlocRecord::Collection.new
 
-    rows.each { |row| collection << new(Hash[fields.zip(row)]) }
-    collection
+    rows_array = rows_to_arrays(rows)
+    rows_array.each do |row|
+      if row.contains?("null")
+        raise MissingAttributeError, "MissingAttributeError: missing attribute: #{row}"
+      else
+        rows_array
+      end
+    end
   end
 
   def limit(value, offset=0)
@@ -227,5 +232,9 @@ def order(*args)
     collection = BlocRecord::Collection.new
     rows.each { |row| collection << new(Hash[columns.zip(row)]) }
     collection
+  end
+
+  # custom error class inherits from StandardError
+  class MissingAttributeError < StandardError
   end
 end

@@ -11,8 +11,9 @@ module BlocRecord
     end
 
     def distinct # same chaining issue as other places - not sure what we're selecting FROM
+      self.#something
       row = connection.execute <<-SQL
-        SELECT DISTINCT FROM --subset of table returned by selection?
+        SELECT DISTINCT FROM #{self}--subset of table returned by selection?
       SQL
 
     end
