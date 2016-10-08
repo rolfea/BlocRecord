@@ -24,7 +24,7 @@ and not individual instances of it. Because we need to save the instances of the
 we need to use instance methods, which will be carried over to the base class by 'including' the Persistence
 module.
 
-6. UPDATE characters SET character_name,star_rating WHERE id = (SELECT 1);
+6. UPDATE characters SET character_name = "Jar-Jar Binks",star_rating = 1 WHERE id = 1;
 
 7. In order for entries to return something, it must exist. We removed the initializer from address_book.rb that
 set entries as an array, so presumably we will replace this with a reference to the database so that any
