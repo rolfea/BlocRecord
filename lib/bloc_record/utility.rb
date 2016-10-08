@@ -3,9 +3,9 @@ module BlocRecord
     extend self
 
     def underscore(camel_cased_word)
-      string = camel_cased_word.gsub(/::/, '/')
-      string.gsub!(/([A-Z]+)([A-Z][a-z])/,'1_/2')
-      string.gsub!(/([a-z/d])([A-Z])/,'/1_/2')
+      string = camel_cased_word.gsub(/::/, '_')
+      string.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+      string.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
       string.tr!("-", "_")
       string.downcase
     end
@@ -22,7 +22,7 @@ module BlocRecord
     end
 
     def convert_keys(options)
-      options.keys.each {|k| option[k.to_s] = options.delete(k) if k.kind_of?(Symbol)}
+      options.keys.each {|k| options[k.to_s] = options.delete(k) if k.kind_of?(Symbol)}
       options
     end
 
@@ -31,7 +31,7 @@ module BlocRecord
     end
 
     def reload_object(dirty_obj)
-      persisted_obj = dirty_obj.class.find(dirty_obj.id)
+      persisted_obj = dirty_obj.class.find_one(dirty_obj.id)
       dirty_obj.instance_variables.each do |instance_variable|
         dirty_obj.instance_variable_set(instance_variable, persisted_obj.instance_variable_get(instance_variable))
       end

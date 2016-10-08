@@ -13,7 +13,7 @@ module Persistence
       vals = attributes.map {|key| BlocRecord::Utility.sql_strings(attrs[key])}
 
       connection.execute <<-SQL
-        INSERT INTO #{table} (#{attributes.join(","})
+        INSERT INTO #{table} (#{attributes.join(",")})
         VALUES (#{vals.join(",")});
       SQL
 
