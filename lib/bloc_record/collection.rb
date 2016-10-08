@@ -12,6 +12,18 @@ module BlocRecord
       SQL
     end
 
+    def destroy_all
+      ids = ""
+      self.each do |object|
+        ids << object.id + ", "
+      end
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE id in (#{ids})
+      SQL
+    end
+
     def where(*args) # is there any reason that I can't use the same method from selection here?
       if args.count > 1
         expression = args.shift
