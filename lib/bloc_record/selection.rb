@@ -85,34 +85,6 @@ module Selection
   end
 
   def where(*args)
-    # check for nil
-    if args.length == 0 # where returns object with a #not method
-    def not(*args) # does where execute the conditional first if no params passed to it?
-      if args.count > 1
-        expression = args.shift
-        expression.insert(0, "!") # flip the expression for negation
-        params = args
-      else
-        case args.first
-        when String
-          expression = args.first
-          expression.insert(0, "!") # flip the expression for negation
-        when Hash
-          expression_hash = BlocRecord::Utility.convert_keys(args.first)
-          expression = expression_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" AND ")
-          expression.insert(0, "!") # flip the expression for negation
-        end
-      end
-
-      sql = <<-SQL
-        SELECT #{columns.join(",")} FROM #{table}
-        WHERE #{expression};
-      SQL
-
-      rows = connection.execute(sql, params)
-      return rows_to_array(rows)
-    end
-
     if args.count > 1
       expression = args.shift
       params = args
