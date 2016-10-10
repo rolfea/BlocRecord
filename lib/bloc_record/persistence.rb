@@ -64,7 +64,7 @@ module Persistence
       true
     end
 
-    def destroy_all(conditions=nil)
+    def destroy_all(*conditions=nil)
       # #3 from assignment, using execute(sql, params) syntax
       if conditions.length > 1
         sql_expression = conditions.shift
@@ -77,8 +77,8 @@ module Persistence
 
         connection.execute(sql, params)
       # Hash passed in a condition
-      elsif conditions.first.class == Hash && !conditions.empty?
-        conditions = BlocRecord::Utility.convert_keys(conditions)
+      elsif conditions.first.class == Hash && !conditions.first.empty?
+        conditions = BlocRecord::Utility.convert_keys(conditions.first)
         conditions = conditions.map {|key, value| "#{key} = #{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
 
         connection.execute <<-SQL
@@ -86,10 +86,10 @@ module Persistence
           WHERE #{conditions}
         SQL
       # #2 from assignment. String passed as condition
-      elsif conditions.first.class == String && !conditions.empty?
+      elsif conditions.first.class == String && !conditions.first.empty?
         connection.execute <<-SQL
           DELETE FROM #{table}
-          WHERE #{conditions}
+          WHERE #{conditions.first}
         SQL
       else
         connection.execute <<-SQL
