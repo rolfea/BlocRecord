@@ -27,10 +27,8 @@ module BlocRecord
             # because the assignment asks for a single record, we return this first match
             return distinct_record << self[i]
           end
-        end
+        end        
       end
-      # return first distinct in this new Array
-      distinct_array.first
     end
 
     def take(num=1)
