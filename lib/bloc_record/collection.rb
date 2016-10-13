@@ -12,19 +12,21 @@ module BlocRecord
           taken_records << self[i]
         end
       else
-        taken_records << self.first
+        # return a single record, not a collection of 1
+        return self.first
       end
       taken_records
     end
 
-    def where(*args)
+    # assume args will always be a hash
+    def where(args)
       where_records = Collection.new
-      # assuming the collection Object responds to Object.id syntax
-      # assuming args is a Hash - for string would need regex?
       self.each do |record|
-        if record.args.first.key == args.first[args.first.key]
-          where_records << record
+        total_match = true
+        args.each_key do |key|
+          total_match = false unless record[key] == args[key]
         end
+        where_records << record if total_match == true
       end
       where_records
     end
