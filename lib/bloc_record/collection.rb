@@ -18,6 +18,18 @@ module BlocRecord
       taken_records
     end
 
+    def destroy_all
+      ids = ""
+      self.each do |object|
+        ids << object.id + ", "
+      end
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE id in (#{ids})
+      SQL
+    end
+
     # assume args will always be a hash
     def where(args)
       where_records = Collection.new

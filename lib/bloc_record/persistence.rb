@@ -49,6 +49,58 @@ module Persistence
       true
     end
 
+    def destroy(*id)
+      if id.length > 1
+        where_clause = "WHERE id IN (#{id.join(",")})"
+      else
+        where_clause = "WHERE id = #{id.first};"
+      end
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        #{where_clause}
+      SQL
+
+      true
+    end
+
+    def destroy_all(*conditions=nil)
+      # #3 from assignment, using execute(sql, params) syntax
+      if conditions.length > 1
+        sql_expression = conditions.shift
+        params = conditions
+
+        sql = <<-SQL
+          DELETE FROM #{table}
+          WHERE #{sql_expression}
+        SQL
+
+        connection.execute(sql, params)
+      # Hash passed in a condition
+      elsif conditions.first.class == Hash && !conditions.first.empty?
+        conditions = BlocRecord::Utility.convert_keys(conditions.first)
+        conditions = conditions.map {|key, value| "#{key} = #{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
+
+        connection.execute <<-SQL
+          DELETE FROM #{table}
+          WHERE #{conditions}
+        SQL
+      # #2 from assignment. String passed as condition
+      elsif conditions.first.class == String && !conditions.first.empty?
+        connection.execute <<-SQL
+          DELETE FROM #{table}
+          WHERE #{conditions.first}
+        SQL
+      else
+        connection.execute <<-SQL
+          DELETE FROM #{table}
+        SQL
+      end
+
+
+      true
+    end
+
     def save!
       unless self.id
         self.id = self.class.create(BlocRecord::Utility.instance_variables_to_hash(self)).id
@@ -77,6 +129,10 @@ module Persistence
 
     def update_attributes(updates)
       self.class.update(self.id, updates)
+    end
+
+    def destroy
+      self.class.destroy(self.id)
     end
 
     def update_all(updates)
