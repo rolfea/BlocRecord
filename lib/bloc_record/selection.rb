@@ -89,14 +89,8 @@ module Selection
       SELECT #{fields * ", "} FROM #{table}
     SQL
 
-    rows_array = rows_to_arrays(rows)
-    rows_array.each do |row|
-      if row.contains?("null")
-        raise MissingAttributeError, "MissingAttributeError: missing attribute: #{row}"
-      else
-        rows_array
-      end
-    end
+    rows_array = rows_to_array(rows)
+    rows_array
   end
 
   def limit(value, offset=0)
@@ -169,7 +163,7 @@ module Selection
     rows_to_array(rows)
   end
 
-def order(*args)
+  def order(*args)
     if args.count > 1
       order = args.join(",")
       order.each_with_index do |param, index|
@@ -182,11 +176,12 @@ def order(*args)
     else
       order = args.first.to_s
     end
+
     rows = connection.execute <<-SQL
       SELECT * FROM #{table}
       ORDER BY #{order};
     SQL
-    rows_to_arrays(rows)
+    rows_to_array(rows)
   end
 
   def join(*args)
@@ -232,9 +227,5 @@ def order(*args)
     collection = BlocRecord::Collection.new
     rows.each { |row| collection << new(Hash[columns.zip(row)]) }
     collection
-  end
-
-  # custom error class inherits from StandardError
-  class MissingAttributeError < StandardError
   end
 end
