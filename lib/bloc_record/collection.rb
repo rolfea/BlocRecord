@@ -14,33 +14,29 @@ module BlocRecord
     end
 
     def take(num=1)
-      rows = connection.execute <<-SQL
-        SELECT * FROM #{table}
-        LIMIT #{num}
-      SQL
+      taken_records = Collection.new
+      if num > 1
+        for i in (0..num) do
+          taken_records << self[i]
+        end
+      else
+        # return a single record, not a collection of 1
+        return self.first
+      end
+      taken_records
     end
 
-    def where(*args) # is there any reason that I can't use the same method from selection here?
-      if args.count > 1
-        expression = args.shift
-        params = args
-      else
-        case args.first
-        when String
-          expression = args.first
-        when Hash
-          expression_hash = BlocRecord::Utility.convert_keys(args.first)
-          expression = expression_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
+    # assume args will always be a hash
+    def where(args)
+      where_records = Collection.new
+      self.each do |record|
+        total_match = true
+        args.each_key do |key|
+          total_match = false unless record[key] == args[key]
         end
+        where_records << record if total_match == true
       end
-
-      sql = <<-SQL
-        SELECT #{columns.join(",")} FROM #{table}
-        WHERE #{expression};
-      SQL
-
-      rows = connection.execute(sql, params)
-      rows_to_array(rows)
+      where_records
     end
   end
 end
