@@ -84,12 +84,12 @@ module Selection
     rows_to_array(rows)
   end
 
-  def select(*fields)
+  #trying a fix for select bug by using default column param in rows_to_array
+  def select(*fields)    
     rows = connection.execute <<-SQL
       SELECT #{fields * ", "} FROM #{table}
     SQL
-
-    rows_array = rows_to_array(rows)
+    rows_array = rows_to_array(rows, fields)
     rows_array
   end
 
@@ -195,7 +195,7 @@ module Selection
     end
   end
 
-  def rows_to_array(rows)
+  def rows_to_array(rows, columns=columns)
     collection = BlocRecord::Collection.new
     rows.each { |row| collection << new(Hash[columns.zip(row)]) }
     collection
