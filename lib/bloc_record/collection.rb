@@ -12,24 +12,15 @@ module BlocRecord
 
     def distinct
       new_collection = self
-      puts "------------"
-      puts "Collection at 0: #{new_collection[0]}"
-      puts "------------"
-      puts "Collection at 2: #{new_collection[2]}"
-      puts "------------"
-      puts "Collection at 3: #{new_collection[3]}"
-      puts "------------"
-      puts "new_collection[0] == new_collection[2]: #{new_collection[0] == new_collection[2]}"
-      puts "new_collection[0] == new_collection[3]: #{new_collection[0] == new_collection[3]}"
-      puts "------------"
-      # pointer = 0
-      # length_minus_one = new_collection.length - 1
-      # new_collection[0..(length_minus_one)].each do |record|
-      #   for i in (pointer + 1)..length_minus_one do
-      #      new_collection.delete_at(i) if new_collection[pointer] == new_collection[i]
-      #   end
-      # end
-      # new_collection
+      length_minus_one = new_collection.length - 1
+
+      for p in 0..length_minus_one do
+        pointer = p
+        for i in (pointer + 1)..length_minus_one do
+          new_collection.delete_at(i) if new_collection[pointer] == new_collection[i]
+        end
+      end
+      new_collection
     end
 
     def take(num=1)
