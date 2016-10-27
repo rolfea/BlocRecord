@@ -1,4 +1,5 @@
 require 'sqlite3'
+require_relative 'missing_attribute_error.rb'
 
 module Selection
   def find(*ids)
@@ -84,11 +85,15 @@ module Selection
     rows_to_array(rows)
   end
 
-  #trying a fix for select bug by using default column param in rows_to_array
-  def select(*fields)    
-    rows = connection.execute <<-SQL
-      SELECT #{fields * ", "} FROM #{table}
-    SQL
+  def select(*fields)
+    begin
+      rows = connection.execute <<-SQL
+        SELECT #{fields * ", "} FROM #{table}
+      SQL
+    rescue => detail
+      print detail.backtrace.join("\n")
+      raise MissingAttributeError      
+    end
     rows_array = rows_to_array(rows, fields)
     rows_array
   end
@@ -195,9 +200,9 @@ module Selection
     end
   end
 
-  def rows_to_array(rows, columns=columns)
+  def rows_to_array(rows, schema_columns=columns)
     collection = BlocRecord::Collection.new
-    rows.each { |row| collection << new(Hash[columns.zip(row)]) }
+    rows.each { |row| collection << new(Hash[schema_columns.zip(row)]) }
     collection
   end
 end
