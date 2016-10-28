@@ -86,14 +86,28 @@ module Selection
   end
 
   def select(*fields)
-    begin
-      rows = connection.execute <<-SQL
-        SELECT #{fields * ", "} FROM #{table}
-      SQL
-    rescue => detail
-      print detail.backtrace.join("\n")
-      raise MissingAttributeError      
-    end
+    available_columns = columns # is this more memory efficient than repeatedly calling columns from schema?
+    validated_fields = []
+    fields.each do |field|
+      field_present = false
+      available_columns.each do |column|
+        if field.to_s == column
+          puts "true!"
+          field_present = true
+          break
+        end
+      end
+      if field_present == true # this is only necessary if we need to still run the query
+        validated_fields << field
+      else
+        puts field
+        raise MissingAttributeError.new("MissingAttributeError: missing attribute: #{field}") # put the error here
+      end
+    end    
+
+    rows = connection.execute <<-SQL
+      SELECT #{fields * ", "} FROM #{table}
+    SQL
     rows_array = rows_to_array(rows, fields)
     rows_array
   end
