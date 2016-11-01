@@ -11,15 +11,20 @@ module BlocRecord
     end
 
     def distinct
-      new_collection = self
+      new_collection = Collection.new
       length_minus_one = new_collection.length - 1
 
-      for p in 0..length_minus_one do
-        pointer = p
-        for i in (pointer + 1)..length_minus_one do
-          new_collection.delete_at(i) if new_collection[pointer] == new_collection[i]
+      self.each do |original_entry|
+        entry_distinct = true
+        new_collection.each do |collection_entry|
+          if original_entry == collection_entry
+            entry_distinct = false
+            break
+          end
         end
+        new_collection << original_entry if entry_distinct == true
       end
+
       new_collection
     end
 
