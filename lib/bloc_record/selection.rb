@@ -1,7 +1,8 @@
 require 'sqlite3'
+require_relative 'missing_attribute_error.rb'
 
 module Selection
-  def find(ids)
+  def find(*ids)
     if ids.length == 1
       find_one(ids.first)
     else
@@ -26,7 +27,7 @@ module Selection
   def find_by(attribute, value)
     row = connection.get_first_row <<-SQL
       SELECT #{columns.join(",")} FROM #{table}
-      WHERE attribute = #{BlocRecord::Utility.sql_strings(value)};
+      WHERE #{attribute} = #{BlocRecord::Utility.sql_strings(value)};
     SQL
 
     init_object_from_row(row)
@@ -84,7 +85,53 @@ module Selection
     rows_to_array(rows)
   end
 
-  def where(*args)    
+  def select(*fields)
+    available_columns = columns # is this more memory efficient than repeatedly calling columns from schema?
+    validated_fields = []
+    fields.each do |field|
+      field_present = false
+      available_columns.each do |column|
+        if field.to_s == column
+          puts "true!"
+          field_present = true
+          break
+        end
+      end
+      if field_present == true # this is only necessary if we need to still run the query
+        validated_fields << field
+      else
+        puts field
+        raise MissingAttributeError.new("MissingAttributeError: missing attribute: #{field}") # put the error here
+      end
+    end
+
+    rows = connection.execute <<-SQL
+      SELECT #{fields * ", "} FROM #{table}
+    SQL
+    rows_array = rows_to_array(rows, fields)
+    rows_array
+  end
+
+  def limit(value, offset=0)
+    rows = connection.execute <<-SQL
+      SELECT * FROM #{table}
+      LIMIT #{value} OFFSET #{offset}
+    SQL
+    rows_to_array(rows)
+  end
+
+  def group(*args)
+    conditions = args.join(', ')
+
+    rows = connection.execute <<-SQL
+      SELECT * FROM #{table}
+      GROUP BY #{conditions}
+    SQL
+
+    rows_to_array(rows)
+  end
+
+  def where(*args)
     if args.count > 1
       expression = args.shift
       params = args
@@ -107,7 +154,7 @@ module Selection
     rows_to_array(rows)
   end
 
-def order(*args)
+  def order(*args)
     if args.count > 1
       order = args.join(",")
       order.each_with_index do |param, index|
@@ -120,11 +167,12 @@ def order(*args)
     else
       order = args.first.to_s
     end
+
     rows = connection.execute <<-SQL
       SELECT * FROM #{table}
       ORDER BY #{order};
     SQL
-    rows_to_arrays(rows)
+    rows_to_array(rows)
   end
 
   def join(*args)
@@ -166,9 +214,9 @@ def order(*args)
     end
   end
 
-  def rows_to_array(rows)
+  def rows_to_array(rows, schema_columns=columns)
     collection = BlocRecord::Collection.new
-    rows.each { |row| collection << new(Hash[columns.zip(row)]) }
+    rows.each { |row| collection << new(Hash[schema_columns.zip(row)]) }
     collection
   end
 end

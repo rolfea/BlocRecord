@@ -1,9 +1,9 @@
-require 'bloc_record/utility'
-require 'bloc_record/schema'
-require 'bloc_record/persistence'
-require 'bloc_record/selection'
-require 'bloc_record/connection'
-require 'bloc_record/collection'
+require_relative 'utility'
+require_relative 'schema'
+require_relative 'persistence'
+require_relative 'selection'
+require_relative 'connection'
+require_relative 'collection'
 
  module BlocRecord
    class Base
@@ -14,7 +14,6 @@ require 'bloc_record/collection'
 
      def initialize(options={})
        options = BlocRecord::Utility.convert_keys(options)
-
        self.class.columns.each do |col|
          self.class.send(:attr_accessor, col)
          self.instance_variable_set("@#{col}", options[col])
