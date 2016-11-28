@@ -23,8 +23,7 @@ module BlocRecord
     end
 
     def distinct
-      new_collection = Collection.new
-      length_minus_one = new_collection.length - 1
+      new_collection = Collection.new      
 
       self.each do |original_entry|
         entry_distinct = true
